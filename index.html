@@ -5255,6 +5255,11 @@ function adminTopSearchSelect(idx) {
     if (sel && realIdx >= 0) { sel.value = realIdx; loadAdminInfo(); }
     return;
   }
+  if (panelId === 'panel-op') {
+    const realIdx = candidates.indexOf(c);
+    if (realIdx >= 0) { curIdx = realIdx; renderOpinionAdmin(); }
+    return;
+  }
 
   /* 인사이트 패널: 해당 인원 직접 선택 (탭 이동 없음) */
   if (panelId === 'panel-insight') {
@@ -5295,6 +5300,11 @@ function adminTopSearchGo(q) {
 
 function searchAndGo(q) {
   if (!q.trim()) return;
+  /* 관리자 '면접관 의견 관리' 탭이 활성이면 화면 전환 없이 갱신만 */
+  const onOpinionPanel = () => {
+    const p = document.getElementById('panel-op');
+    return p && p.classList.contains('active');
+  };
   /* 드롭다운이 열려 있으면 첫 번째 항목 사용 */
   for (const dropId of ['sd-c', 'sd-r']) {
     const dd = $(dropId);
@@ -5304,6 +5314,7 @@ function searchAndGo(q) {
         const idx = parseInt(firstRow.dataset.idx);
         closeSearch();
         document.querySelectorAll('.topbar-search input').forEach(el => el.value = '');
+        if (onOpinionPanel()) { curIdx = idx; renderOpinionAdmin(); return; }
         if (curPage === 'confirm') { jumpToReview(idx); }
         else moveTo(idx, true);
         return;
@@ -5318,6 +5329,7 @@ function searchAndGo(q) {
   const idx = candidates.indexOf(hit);
   closeSearch();
   document.querySelectorAll('.topbar-search input').forEach(el => el.value = '');
+  if (onOpinionPanel()) { curIdx = idx; renderOpinionAdmin(); return; }
   if (curPage === 'confirm') { jumpToReview(idx); }
   else moveTo(idx, true);
 }
